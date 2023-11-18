@@ -10,6 +10,7 @@ tree = app_commands.CommandTree(client)
 
 quotes_file = "quotes.txt"
 
+
 def save_quotes():
     with open(quotes_file, "w") as file:
         file.write("\n".join(quotes))
@@ -22,24 +23,29 @@ def load_quotes():
     except FileNotFoundError:
         return []
 
+
 quotes = load_quotes()
+
 
 @client.event
 async def on_ready():
     await tree.sync()
-    print('Ready!')
+    print("Ready!")
+
 
 @client.event
 async def on_message(message):
-    print(f'Received a message in {message.channel.name} from {message.author.name}')
-    if message.channel.name == 'quotes' and '"' in message.content:
+    print(f"Received a message in {message.channel.name} from {message.author.name}")
+    if message.channel.name == "quotes" and '"' in message.content:
         quotes.append(message.content)
         save_quotes()
+
 
 @tree.command(name="dadjoke", description="random dadjoke")
 async def first_command(interaction):
     joke = get_dad_joke()
     await interaction.response.send_message(joke)
+
 
 @tree.command(name="pronoun", description="set pronoun as a role")
 async def set_pronoun_role(interaction, pronoun_role: str):
@@ -52,7 +58,9 @@ async def set_pronoun_role(interaction, pronoun_role: str):
         try:
             role = await guild.create_role(name=pronoun_role)
         except discord.Forbidden:
-            await interaction.response.send_message("I don't have permission to create roles.")
+            await interaction.response.send_message(
+                "I don't have permission to create roles."
+            )
             return
         except discord.HTTPException:
             await interaction.response.send_message("Failed to create role.")
@@ -61,11 +69,16 @@ async def set_pronoun_role(interaction, pronoun_role: str):
     # assign role to member
     try:
         await member.add_roles(role)
-        await interaction.response.send_message(f"Role '{pronoun_role}' has been assigned.")
+        await interaction.response.send_message(
+            f"Role '{pronoun_role}' has been assigned."
+        )
     except discord.Forbidden:
-        await interaction.response.send_message("I don't have permission to assign roles.")
+        await interaction.response.send_message(
+            "I don't have permission to assign roles."
+        )
     except discord.HTTPException:
         await interaction.response.send_message("Failed to assign role.")
+
 
 @tree.command(name="quotes", description="show the 10 most recent quotes")
 async def recent_quotes_command(interaction):
@@ -77,6 +90,7 @@ async def recent_quotes_command(interaction):
         quotes_message = "\n".join(recent_quotes)
         await interaction.response.send_message(quotes_message)
 
+
 @tree.command(name="quoteslist", description="list all quotes")
 async def list_quotes_command(interaction):
     if not quotes:
@@ -86,12 +100,14 @@ async def list_quotes_command(interaction):
         await interaction.response.send_message("Here are all the quotes:", file=file)
 
 
-
 @tree.command(name="invite", description="generate a one-time invite to the server")
 async def second_command(interaction):
     guild = client.get_guild(interaction.guild_id)
     invite = await guild.text_channels[0].create_invite(max_uses=1)
-    await interaction.response.send_message(f"Here's a one-time invite to the server: {invite.url}")
+    await interaction.response.send_message(
+        f"Here's a one-time invite to the server: {invite.url}"
+    )
+
 
 @tree.command(name="quoterandom", description="get a random quote from the list")
 async def random_quote_command(interaction):
@@ -100,6 +116,7 @@ async def random_quote_command(interaction):
     else:
         random_quote = random.choice(quotes)
         await interaction.response.send_message(random_quote)
+
 
 @tree.command(name="quoteadd", description="add a quote to the list")
 async def add_quote_command(interaction, quote: str):
@@ -110,11 +127,14 @@ async def add_quote_command(interaction, quote: str):
 
 @client.event
 async def on_message(message):
-    if message.channel.name == 'quotes' and '"' in message.content:
+    if message.channel.name == "quotes" and '"' in message.content:
         print(message.content)
 
+
 def get_dad_joke():
-    response = requests.get("https://icanhazdadjoke.com/", headers={"Accept": "application/json"})
+    response = requests.get(
+        "https://icanhazdadjoke.com/", headers={"Accept": "application/json"}
+    )
     joke = response.json()["joke"]
     return joke
 
