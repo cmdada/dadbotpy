@@ -6,10 +6,16 @@ intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
-@tree.command(name="dadjoke", description="random dadjoke") 
+@tree.command(name="dadjoke", description="random dadjoke")
 async def first_command(interaction):
     joke = get_dad_joke()
     await interaction.response.send_message(joke)
+
+@tree.command(name="invite", description="generate a one-time invite to the server")
+async def second_command(interaction):
+    guild = client.get_guild(interaction.guild_id)
+    invite = await guild.text_channels[0].create_invite(max_uses=1)
+    await interaction.response.send_message(f"Here's a one-time invite to the server: {invite.url}")
 
 def get_dad_joke():
     response = requests.get("https://icanhazdadjoke.com/", headers={"Accept": "application/json"})
@@ -18,7 +24,7 @@ def get_dad_joke():
 
 @client.event
 async def on_ready():
-    await tree.sync(guild=discord.Object(id=1175224722598936656))
+    await tree.sync()
     print("Ready!")
 
-client.run("wow you really think im going to put the token in a PUBLIC git repo")
+client.run("your token (crazy)")
